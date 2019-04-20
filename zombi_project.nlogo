@@ -1,7 +1,6 @@
 __includes [ "humains.nls" "zombies.nls" "objets.nls" ]
 
 ;Modèle de propagation d'épidemie zombie
-breed[individus individu]
 
 
 
@@ -10,12 +9,6 @@ directed-link-breed [contaminations contamination]
 
 patches-own[
   accessible?
-]
-
-individus-own
-[
-  infecte?
-  arme?
 ]
 
 
@@ -50,10 +43,10 @@ end
 
 
 to deplacements-individus
- ask (individus with [infecte?])[
+ ask (zombies)[
   deplacement-zombies
  ]
-  ask (individus with [not infecte?])
+  ask (humains)
   [
       deplacement-humains
   ]
@@ -63,7 +56,7 @@ end
 
 
 to initialisation-epidemie
-  ask n-of (taux_infectes_init * count individus) individus
+  ask n-of (taux_infectes_init * count humains) humains
     [
       devient-infecte
     ]
@@ -74,7 +67,7 @@ end
 
 
 to pas-simulation
-    if all? individus [infecte?]
+    if count humains = 0
     [ stop ]
   deplacements-individus
   tick
@@ -223,7 +216,7 @@ MONITOR
 788
 83
 taux_infecté
-count individus with [infecte?] / count individus
+count zombies / (count zombies + count humains)
 17
 1
 11
@@ -244,8 +237,8 @@ true
 false
 "" ""
 PENS
-"humains" 1.0 0 -11085214 true "" "plot count individus with [not infecte?]"
-"zombies" 1.0 0 -2674135 true "" "plot count individus with [infecte?]"
+"humains" 1.0 0 -11085214 true "" "plot count humains"
+"zombies" 1.0 0 -2674135 true "" "plot count zombies"
 
 SLIDER
 12
