@@ -1,0 +1,9 @@
+breed[objets arme]
+
+to init-objet
+   create-objets nb_armes[
+    set shape "lance"
+    set size 1
+    move-to one-of patches with [accessible?]
+  ]
+end

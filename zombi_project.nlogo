@@ -1,6 +1,9 @@
+__includes [ "humains.nls" "zombies.nls" "objets.nls" ]
+
 ;Modèle de propagation d'épidemie zombie
 breed[individus individu]
-breed[objets arme]
+
+
 
 directed-link-breed [contaminations contamination]
 
@@ -15,12 +18,6 @@ individus-own
   arme?
 ]
 
-
-to devient-infecte
-  set infecte? true
-  set color grey
-  set shape "zombie"
-end
 
 
 to init-patches
@@ -37,21 +34,13 @@ end
 to init-simulation
   __clear-all-and-reset-ticks
   init-patches
-  create-individus nb_individus[
-    set shape "person"
-    move-to one-of patches with [accessible?]
-    set color green
-    set infecte? false
-    set arme? false
-  ]
-  create-objets nb_armes[
-    set shape "lance"
-    set size 1
-    move-to one-of patches with [accessible?]
-  ]
+  init-humains
+  init-objet
+
   initialisation-epidemie
 end
 
+; commun aux humains et aux zombies
 to deplacement-aleatoire
   let patches_possibles (patches with [accessible?] in-radius dist_max_deplacement)
   if any? patches_possibles[
@@ -59,40 +48,19 @@ to deplacement-aleatoire
   ]
 end
 
+
 to deplacements-individus
- ask (individus with [infecte?])
-  [
-    ifelse (any? ((individus with [not infecte?]) in-radius dist_perception)) [	   deplacement-attaque
-      ]
-    [
-   deplacement-aleatoire
-    ]
-    infections-individus
-  ]
+ ask (individus with [infecte?])[
+  deplacement-zombies
+ ]
   ask (individus with [not infecte?])
   [
-      ifelse (any? ((individus with [infecte?]) in-radius dist_perception)) [	   deplacement-fuite
-      ]
-      [
-        deplacement-aleatoire
-      ]
+      deplacement-humains
   ]
 end
 
 
-to infections-individus
-  if (any? ((individus with [not infecte?]) in-radius dist_infection))[
-      set color red
-      ask individus in-radius dist_infection with [not infecte?]
-      [
-        if random-float 1 <= proba_infection [
-          devient-infecte
-          ;create-contamination-from myself [set color orange]
-        ]
-      ]
-      set color grey
-    ]
-end
+
 
 to initialisation-epidemie
   ask n-of (taux_infectes_init * count individus) individus
@@ -101,21 +69,9 @@ to initialisation-epidemie
     ]
 end
 
-to deplacement-fuite
-  let zombie_plus_proche min-one-of (individus with [infecte?]) [distance myself]
-  let patches_possibles (patches in-radius dist_max_deplacement) with [accessible?]
-  if (any? patches_possibles) [
-    move-to max-one-of patches_possibles [distance zombie_plus_proche]
-  ]
-end
 
-to deplacement-attaque
-  let humain_plus_proche min-one-of (individus with [not infecte?]) [distance myself]
-  let patches_possibles (patches in-radius dist_max_deplacement) with [accessible?]
-  if (any? patches_possibles) [
-    move-to min-one-of patches_possibles [distance humain_plus_proche]
-  ]
-end
+
+
 
 to pas-simulation
     if all? individus [infecte?]
