@@ -6,23 +6,27 @@ humains-own
 ]
 
 to devient-infecte
-  set infecte? true
-  set color grey
-  set shape "zombie"
+   
+  ask patches in-radius 0[
+   sprout-zombies 1[
+      set color grey
+      set shape "zombie"
+   ]
+  ]  
+  die
 end
 
 to init-humains
-  create-individus nb_individus[
+  create-humains nb_individus[
     set shape "person"
     move-to one-of patches with [accessible?]
     set color green
-    set infecte? false
     set arme? false
   ]
 end
 
 to deplacement-fuite
-  let zombie_plus_proche min-one-of (individus with [infecte?]) [distance myself]
+  let zombie_plus_proche min-one-of (zombies) [distance myself]
   let patches_possibles (patches in-radius dist_max_deplacement) with [accessible?]
   if (any? patches_possibles) [
     move-to max-one-of patches_possibles [distance zombie_plus_proche]
@@ -30,7 +34,7 @@ to deplacement-fuite
 end
 
 to deplacement-humains
-  ifelse (any? ((individus with [infecte?]) in-radius dist_perception)) [	   
+  ifelse (any? ((zombies) in-radius dist_perception)) [	   
     deplacement-fuite
   ]
   [

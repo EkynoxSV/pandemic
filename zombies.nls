@@ -1,7 +1,7 @@
 breed[zombies zombie]
 
 to deplacement-zombies
-    ifelse (any? ((individus with [not infecte?]) in-radius dist_perception)) [	   deplacement-attaque
+    ifelse (any? ((humains) in-radius dist_perception)) [	   deplacement-attaque
       ]
     [
    deplacement-aleatoire
@@ -10,7 +10,7 @@ to deplacement-zombies
 end
 
 to deplacement-attaque
-  let humain_plus_proche min-one-of (individus with [not infecte?]) [distance myself]
+  let humain_plus_proche min-one-of (humains) [distance myself]
   let patches_possibles (patches in-radius dist_max_deplacement) with [accessible?]
   if (any? patches_possibles) [
     move-to min-one-of patches_possibles [distance humain_plus_proche]
@@ -18,15 +18,15 @@ to deplacement-attaque
 end
 
 to infections-individus
-  if (any? ((individus with [not infecte?]) in-radius dist_infection))[
-      set color red
-      ask individus in-radius dist_infection with [not infecte?]
+  if (any? humains in-radius dist_infection)[
+      ask humains in-radius dist_infection
       [
+      set color red
         if random-float 1 <= proba_infection [
           devient-infecte
           ;create-contamination-from myself [set color orange]
         ]
+      set color green
       ]
-      set color grey
     ]
 end
