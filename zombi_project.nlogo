@@ -168,10 +168,10 @@ NIL
 1
 
 SLIDER
-19
-142
-191
-175
+1269
+14
+1441
+47
 taux_infectes_init
 taux_infectes_init
 0
@@ -183,10 +183,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-18
-195
-190
-228
+1268
+67
+1440
+100
 dist_infection
 dist_infection
 0
@@ -198,12 +198,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-13
-242
-185
-275
-proba_infection
-proba_infection
+1269
+109
+1441
+142
+proba_touche
+proba_touche
 0
 1
 0.1
@@ -243,10 +243,10 @@ PENS
 "zombies" 1.0 0 -2674135 true "" "plot count zombies"
 
 SLIDER
-12
-288
-184
-321
+20
+140
+192
+173
 dist_perception
 dist_perception
 0
@@ -258,10 +258,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-342
-187
-375
+23
+194
+195
+227
 nb_armes
 nb_armes
 0
@@ -273,16 +273,31 @@ NIL
 HORIZONTAL
 
 SLIDER
-13
-396
-185
-429
+21
+248
+193
+281
 puissance_arme
 puissance_arme
 0
 1
 0.2
 0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1274
+158
+1446
+191
+proba_infection
+proba_infection
+0
+1
+0.7
+0.05
 1
 NIL
 HORIZONTAL
