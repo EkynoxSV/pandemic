@@ -6,7 +6,15 @@ humains-own
 ]
 
 to devient-infecte
-   
+   ;on lache l'arme si on en a une
+  if(arme?)[
+    ask patches in-radius 0[
+      sprout-armes 1[
+        set size 1
+        set shape "lance"
+      ]
+    ]
+  ]
   ask patches in-radius 0[
    sprout-zombies 1[
       set color grey
@@ -38,6 +46,31 @@ to deplacement-humains
     deplacement-fuite
   ]
   [
+    ifelse(any? (patches in-radius dist_max_deplacement) with [arme_in?] and not arme?)[
+    deplacement-ramassage
+    ]
+  [
     deplacement-aleatoire
+  ]
+  ]
+end
+
+
+to deplacement-ramassage
+  let patches_avec_arme (patches in-radius dist_max_deplacement) with [arme_in?]
+  move-to one-of patches_avec_arme
+  ; on ramasse l'arme
+  set arme? true
+  set shape "resistant"
+  ask one-of armes in-radius 0[
+    die
+  ]
+  ;on regarde si il n'y a plus d'arme au sol pour en informer le patch
+  let nombre_armes_sol count armes in-radius 0
+  ; si il ny a plus d'arme on préviens le patch
+  if (nombre_armes_sol = 0)[
+    ask patches in-radius 0[
+      set arme_in? false
+    ]
   ]
 end

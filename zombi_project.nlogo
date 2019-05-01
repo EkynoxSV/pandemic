@@ -9,6 +9,7 @@ directed-link-breed [contaminations contamination]
 
 patches-own[
   accessible?
+  arme_in?
 ]
 
 
@@ -16,7 +17,7 @@ patches-own[
 to init-patches
   import-pcolors "carte.png"
   ask patches [
-
+    set arme_in? false
     ifelse (pcolor = black) [
       set accessible? true
     ]
@@ -69,10 +70,11 @@ end
 to pas-simulation
     if count humains = 0
     [ stop ]
+  if count zombies = 0
+    [ stop ]
   deplacements-individus
   tick
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -266,6 +268,21 @@ nb_armes
 20
 10.0
 1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+13
+396
+185
+429
+puissance_arme
+puissance_arme
+0
+1
+0.2
+0.1
 1
 NIL
 HORIZONTAL

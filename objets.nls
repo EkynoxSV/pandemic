@@ -1,9 +1,12 @@
-breed[objets arme]
+breed[armes arme]
 
 to init-objet
-   create-objets nb_armes[
+   create-armes nb_armes[
     set shape "lance"
     set size 1
     move-to one-of patches with [accessible?]
+    ask patches in-radius 0[
+      set arme_in? true
+    ]
   ]
 end
