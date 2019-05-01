@@ -61,6 +61,7 @@ to deplacement-ramassage
   move-to one-of patches_avec_arme
   ; on ramasse l'arme
   set arme? true
+  set shape "resistant"
   ask one-of armes in-radius 0[
     die
   ]
