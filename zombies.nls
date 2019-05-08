@@ -1,17 +1,29 @@
 breed[zombies zombie]
 
+
+zombies-own
+[
+  zombie_type
+  multi_infection
+  multi_speed
+  multi_weakness
+  nb_target
+  slaughterer?
+]
+
 to deplacement-zombies
-    ifelse (any? ((humains) in-radius dist_perception)) [	   deplacement-attaque
-      ]
+    ifelse (any? ((humains) in-radius dist_perception)) [	   
+       deplacement-attaque
+       infections-individus
+    ]
     [
    deplacement-aleatoire
     ]
-    infections-individus
 end
 
 to deplacement-attaque
   let humain_plus_proche min-one-of (humains) [distance myself]
-  let patches_possibles (patches in-radius dist_max_deplacement) with [accessible?]
+  let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible?]
   if (any? patches_possibles) [
     move-to min-one-of patches_possibles [distance humain_plus_proche]
   ]
@@ -19,14 +31,54 @@ end
 
 to infections-individus
   if (any? humains in-radius dist_infection)[
-      ask humains in-radius dist_infection
+      ask one-of humains in-radius dist_infection
       [
       set color red
-        if random-float 1 <= proba_infection [
-          devient-infecte
-          ;create-contamination-from myself [set color orange]
+      ifelse(arme?)[
+          if random-float 1 <= proba_touche / 2 [
+            ;lors d'une attaque réussi, le zombie va soit infecter soit tuer sa victime
+            ifelse(slaughterer?)[
+               die
+            ]
+            [
+              ifelse random-float 1 <= proba_infection * multi_infection[
+                devient-infecte
+                ;create-contamination-from myself [set color orange]
+              ]
+            
+            
+              [
+              die
+              ]
+            ]
         ]
+      ]
+      
+      [
+        if random-float 1 <= proba_touche [
+            ifelse(slaughterer?)[
+               die
+            ]
+            [
+              ifelse random-float 1 <= proba_infection * multi_infection[
+                devient-infecte
+                ;create-contamination-from myself [set color orange]
+              ]
+            
+            
+              [
+              die
+              ]
+            ]
+        ]
+      ]
       set color green
+      ;si l'humain tient une arme le zombie à une chance de mourir
+      if(arme?)[
+        if random-float 1 <= puissance_arme * multi_weakness[
+          ask myself [die]
+        ]
+      ]
       ]
     ]
 end
