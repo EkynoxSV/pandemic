@@ -15,12 +15,97 @@ to devient-infecte
       ]
     ]
   ]
-  ask patches in-radius 0[
-   sprout-zombies 1[
-      set color grey
-      set shape "zombie"
-   ]
-  ]  
+  
+  let rande random-float 1
+  ; standard zm
+  if rande  < 0.2[
+    ask patches in-radius 0[
+      sprout-zombies 1[
+        set color grey
+        set shape "zombie"
+        set zombie_type "standard"
+        set multi_infection 1
+        set multi_speed 1
+        set multi_weakness 1
+        set nb_target 1
+        set slaughterer? false
+      
+      ]
+    ]
+  ]
+  ; virulent zm
+  if(rande >= 0.2 and rande < 0.4 )[
+    ask patches in-radius 0[
+      sprout-zombies 1[
+        set color grey
+        set shape "virulent"
+        set zombie_type "virulent"
+        set multi_infection 1.5
+        set multi_speed 1
+        set multi_weakness 1
+        set nb_target 10
+        set slaughterer? false
+      
+      ]
+    ]
+  ]
+  
+  
+  ; masto zm
+  if(rande >= 0.4 and rande < 0.6)[
+    ask patches in-radius 0[
+      sprout-zombies 1[
+        set color grey
+        set shape "mastodonte"
+        set zombie_type "mastodonte"
+        set multi_infection 1
+        set multi_speed 1
+        set multi_weakness 1
+        set nb_target 1
+        set slaughterer? true
+      
+      ]
+    ]
+  ]
+  
+  
+  
+  ; sprinteur zm
+  if(rande >= 0.6 and rande < 0.8)[
+    ask patches in-radius 0[
+      sprout-zombies 1[
+        set color grey
+        set shape "sprinteur"
+        set zombie_type "sprinteur"
+        set multi_infection 1
+        set multi_speed 2
+        set multi_weakness 1
+        set nb_target 2
+        set slaughterer? false
+      
+      ]
+    ]
+  ]
+  
+  
+  
+  ; ranpant zm
+  if(rande >= 0.8 )[
+    ask patches in-radius 0[
+      sprout-zombies 1[
+        set color grey
+        set shape "rampant"
+        set zombie_type "rampant"
+        set multi_infection 1
+        set multi_speed 1
+        set multi_weakness 1.5
+        set nb_target 1
+        set slaughterer? false
+      
+      ]
+    ]
+  ]
+  
   die
 end
 
