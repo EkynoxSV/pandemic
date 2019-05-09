@@ -76,7 +76,15 @@ to infections-individus-virulent
        if(nb_cibles > count(humains in-radius dist_infection))[
          set nb_cibles count(humains in-radius dist_infection)
        ]
-    
+     ask n-of nb_cibles humains in-radius dist_infection
+      [
+     if random-float 1 <= proba_infection[
+                devient-infecte
+                ;create-contamination-from myself [set color orange]
+              ]
+            
+    ]
+  ]
   
   
 end
