@@ -10,6 +10,7 @@ directed-link-breed [contaminations contamination]
 patches-own[
   accessible?
   arme_in?
+
 ]
 
 
@@ -421,6 +422,21 @@ chance_sprinteur
 1
 NIL
 VERTICAL
+
+SLIDER
+1302
+424
+1495
+457
+distance_attaque_humain
+distance_attaque_humain
+0
+10
+1.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

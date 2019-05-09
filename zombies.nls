@@ -13,12 +13,52 @@ zombies-own
 
 to deplacement-zombies
     ifelse (any? ((humains) in-radius dist_perception)) [	   
-       deplacement-attaque
-       infections-individus
+       ifelse( zombie_type = "virulent")[
+           deplacement-virulent
+           
+        ]
+        [
+           deplacement-attaque
+           infections-individus
+        ]
     ]
     [
    deplacement-aleatoire
     ]
+end
+
+to deplacement-virulent
+  let deplace? false
+  let humain_plus_proche min-one-of (humains) [distance myself]
+  ifelse((distance humain_plus_proche) <= distance_attaque_humain)[
+    let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible? and (count(humains in-radius (distance_attaque_humain)) = 0)]
+    if (any? patches_possibles) [
+      move-to min-one-of patches_possibles [distance humain_plus_proche]
+      set deplace? true
+    ]
+    
+  ]
+  [
+      if((distance humain_plus_proche > portee_attaque) )[
+          let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible? and (count(humains in-radius (distance_attaque_humain)) = 0)]
+            if(any? patches_possibles) [
+              move-to min-one-of patches_possibles [distance humain_plus_proche]
+              set deplace? true
+            ]
+      ]
+    
+  ]
+ 
+   infections-individus
+ 
+ if(deplace? = false)[
+     let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible? and (count(humains in-radius (distance_attaque_humain)) = 0)]
+         if (any? patches_possibles) [
+            move-to min-one-of patches_possibles [distance humain_plus_proche]
+            set deplace? true
+         ]
+  ] 
+  
 end
 
 to deplacement-attaque
@@ -27,6 +67,18 @@ to deplacement-attaque
   if (any? patches_possibles) [
     move-to min-one-of patches_possibles [distance humain_plus_proche]
   ]
+end
+
+to infections-individus-virulent
+  
+    if (any? humains in-radius portee_attaque)[
+       let nb_cibles nb_target 
+       if(nb_cibles > count(humains in-radius dist_infection))[
+         set nb_cibles count(humains in-radius dist_infection)
+       ]
+    
+  
+  
 end
 
 to infections-individus
