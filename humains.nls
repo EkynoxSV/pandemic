@@ -24,7 +24,7 @@ to devient-infecte
         set color grey
         set shape "zombie"
         set zombie_type "standard"
-        set multi_infection 1
+        set portee_attaque dist_infection
         set multi_speed 1
         set multi_weakness 1
         set nb_target 1
@@ -40,7 +40,7 @@ to devient-infecte
         set color grey
         set shape "virulent"
         set zombie_type "virulent"
-        set multi_infection 1.5
+        set portee_attaque (dist_infection * multi_distance_contamination_virulent)
         set multi_speed 1
         set multi_weakness 1
         set nb_target 10
@@ -58,9 +58,8 @@ to devient-infecte
         set color grey
         set shape "mastodonte"
         set zombie_type "mastodonte"
-        set multi_infection 1
         set multi_speed 1
-        set multi_weakness 1
+        set multi_weakness (1 / multi_resistance_mastodonte)
         set nb_target 1
         set slaughterer? true
       
@@ -77,8 +76,7 @@ to devient-infecte
         set color grey
         set shape "sprinteur"
         set zombie_type "sprinteur"
-        set multi_infection 1
-        set multi_speed 2
+        set multi_speed multi_vitesse_sprinter
         set multi_weakness 1
         set nb_target 2
         set slaughterer? false
@@ -96,7 +94,6 @@ to devient-infecte
         set color grey
         set shape "rampant"
         set zombie_type "rampant"
-        set multi_infection 1
         set multi_speed 1
         set multi_weakness 1.5
         set nb_target 1

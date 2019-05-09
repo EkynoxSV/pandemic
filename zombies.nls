@@ -3,8 +3,8 @@ breed[zombies zombie]
 
 zombies-own
 [
+  portee_attaque
   zombie_type
-  multi_infection
   multi_speed
   multi_weakness
   nb_target
@@ -30,8 +30,8 @@ to deplacement-attaque
 end
 
 to infections-individus
-  if (any? humains in-radius dist_infection)[
-      ask one-of humains in-radius dist_infection
+  if (any? humains in-radius portee_attaque)[
+      ask n-of nb_target humains in-radius dist_infection
       [
       set color red
       ifelse(arme?)[
@@ -41,7 +41,7 @@ to infections-individus
                die
             ]
             [
-              ifelse random-float 1 <= proba_infection * multi_infection[
+              ifelse random-float 1 <= proba_infection[
                 devient-infecte
                 ;create-contamination-from myself [set color orange]
               ]
@@ -60,7 +60,7 @@ to infections-individus
                die
             ]
             [
-              ifelse random-float 1 <= proba_infection * multi_infection[
+              ifelse random-float 1 <= proba_infection[
                 devient-infecte
                 ;create-contamination-from myself [set color orange]
               ]
