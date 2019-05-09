@@ -12,13 +12,71 @@ zombies-own
 ]
 
 to deplacement-zombies
-    ifelse (any? ((humains) in-radius dist_perception)) [	   
-       deplacement-attaque
-       infections-individus
+  ifelse (any? ((humains) in-radius dist_perception)) [	   
+    ifelse( zombie_type = "virulent")[
+      deplacement-virulent
+      
     ]
     [
-   deplacement-aleatoire
+      deplacement-attaque
+      infections-individus
     ]
+  ]
+  [
+    deplacement-aleatoire
+  ]
+end
+
+to deplacement-virulent
+  let deplace? false
+  let humain_plus_proche min-one-of (humains) [distance myself]
+  ifelse((distance humain_plus_proche) <= 1)[
+    let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible? and (count(humains in-radius (1)) = 0)]
+    if (any? patches_possibles) [
+      move-to min-one-of patches_possibles [distance humain_plus_proche]
+      set deplace? true
+    ]
+    
+  ]
+  [
+    if((distance humain_plus_proche > portee_attaque) )[
+      let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible? and (count(humains in-radius (1)) = 0)]
+      if(any? patches_possibles) [
+        move-to min-one-of patches_possibles [distance humain_plus_proche]
+        set deplace? true
+      ]
+    ]
+    
+  ]
+  infections-individus-virulent
+  
+  if(deplace? = false)[
+    let patches_possibles (patches in-radius (dist_max_deplacement * multi_speed)) with [accessible? and (count(humains in-radius (1)) = 0)]
+    if (any? patches_possibles) [
+      move-to one-of patches_possibles
+      set deplace? true
+    ]
+  ] 
+  
+end
+
+to infections-individus-virulent
+  if (any? (humains in-radius portee_attaque))[
+    let nb_cibles nb_target 
+    if(nb_cibles > count(humains in-radius portee_attaque))[
+      set nb_cibles count(humains in-radius portee_attaque)
+    ]
+    ask n-of nb_cibles humains in-radius portee_attaque
+      [
+        if random-float 1 <= proba_touche[
+          devient-infecte
+          
+        ]
+        
+    ]
+  ]
+  
+  
 end
 
 to deplacement-attaque
@@ -32,34 +90,34 @@ end
 to infections-individus
   if (any? humains in-radius portee_attaque)[
     let nb_cibles nb_target 
-    if(nb_cibles > count(humains in-radius dist_infection))[
-      set nb_cibles count(humains in-radius dist_infection)
-  ]
+    if(nb_cibles > count(humains in-radius 1))[
+      set nb_cibles count(humains in-radius 1)
+    ]
     
     
-      ask n-of nb_cibles humains in-radius dist_infection
-      [
+    ask n-of nb_cibles humains in-radius 1
+    [
       if (myself = nobody) [stop]
       set color red
       ifelse(arme? and porte_barricade = nobody)[
-          if random-float 1 <= proba_touche / 2 [
+        if random-float 1 <= proba_touche / 2 [
           ;l'humain lache ce qu'il tient
           lache-equipement
-            ;lors d'une attaque réussi, le zombie va soit infecter soit tuer sa victime
+          ;lors d'une attaque réussi, le zombie va soit infecter soit tuer sa victime
           ifelse( [slaughterer?] of myself)[
-               die
+            die
+          ]
+          [
+            ifelse random-float 1 <= proba_infection[
+              devient-infecte
+              
             ]
+            
+            
             [
-              ifelse random-float 1 <= proba_infection[
-                devient-infecte
-                ;create-contamination-from myself [set color orange]
-              ]
-            
-            
-              [
               die
-              ]
             ]
+          ]
         ]
       ]
       
@@ -68,19 +126,19 @@ to infections-individus
           ;l'humain lache ce qu'il tient
           lache-equipement
           ifelse(  [slaughterer?] of myself )[
-               die
+            die
+          ]
+          [
+            ifelse random-float 1 <= proba_infection[
+              devient-infecte
+              
             ]
+            
+            
             [
-              ifelse random-float 1 <= proba_infection[
-                devient-infecte
-                ;create-contamination-from myself [set color orange]
-              ]
-            
-            
-              [
               die
-              ]
             ]
+          ]
         ]
       ]
       set color green
@@ -90,6 +148,6 @@ to infections-individus
           ask myself [die]
         ]
       ]
-      ]
     ]
+  ]
 end

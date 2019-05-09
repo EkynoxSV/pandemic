@@ -22,7 +22,7 @@ to devient-infecte
         set color grey
         set shape "zombie"
         set zombie_type "standard"
-        set portee_attaque dist_infection
+        set portee_attaque 1
         set multi_speed 1
         set multi_weakness 1
         set nb_target 1
@@ -40,10 +40,11 @@ to devient-infecte
         set color grey
         set shape "virulent"
         set zombie_type "virulent"
-        set portee_attaque (dist_infection * multi_distance_contamination_virulent)
+        set portee_attaque (1 * multi_distance_contamination_virulent)
+        show portee_attaque
         set multi_speed 1
         set multi_weakness 1
-        set nb_target 10
+        set nb_target nb_cibles_virulent
         set slaughterer? false
         
       ]
@@ -60,7 +61,7 @@ to devient-infecte
         set color grey
         set shape "mastodonte"
         set zombie_type "mastodonte"
-        set portee_attaque dist_infection
+        set portee_attaque 1
         set multi_speed 1
         set multi_weakness (1 / multi_resistance_mastodonte)
         set nb_target 1
@@ -81,7 +82,7 @@ to devient-infecte
         set color grey
         set shape "sprinteur"
         set zombie_type "sprinteur"
-        set portee_attaque dist_infection
+        set portee_attaque 1
         set multi_speed multi_vitesse_sprinter
         set multi_weakness 1
         set nb_target 2
@@ -103,7 +104,7 @@ to devient-infecte
         set color grey
         set shape "rampant"
         set zombie_type "rampant"
-        set portee_attaque dist_infection
+        set portee_attaque 1
         set multi_speed 0.5
         set multi_weakness 1.5
         set nb_target 1
@@ -135,24 +136,39 @@ to deplacement-fuite
 end
 
 to deplacement-humains
-  ifelse(porte_barricade != nobody and (any? ((patches with [pcolor = blue]) in-radius dist_perception)) )[
-    deplacement-fortification
+  ;si l'humain possède une arme et ne porte pas de barricade il va tuer le virulent si il en a un à porté
+  ifelse(any? ((zombies with [zombie_type = "virulent"]) in-radius (dist_max_deplacement + 1)) and arme?)
+  [
+    let virulent_plus_proche min-one-of (zombies with [zombie_type = "virulent"]) [distance myself]
+    let patches_possibles (patches in-radius dist_max_deplacement) with [accessible?]
+    if (any? patches_possibles) [
+      move-to min-one-of patches_possibles [distance virulent_plus_proche]
+      ask virulent_plus_proche
+      [
+        die
+      ]
+  ]
   ]
   [
-    ifelse (any? ((zombies) in-radius dist_perception)) [	   
-      deplacement-fuite
+    ifelse(porte_barricade != nobody and (any? ((patches with [pcolor = blue]) in-radius dist_perception)) )[
+      deplacement-fortification
     ]
     [
-      ifelse(any? (patches in-radius dist_max_deplacement) with [arme_in?] and not arme?)[
-        deplacement-ramassage
+      ifelse (any? ((zombies) in-radius dist_perception)) [	   
+        deplacement-fuite
       ]
       [
-        ifelse (porte_barricade = nobody and (any? ((patches with [barricade_in?]) in-radius dist_max_deplacement)))
-        [
-          deplacement-ramassage-barricade
+        ifelse(any? (patches in-radius dist_max_deplacement) with [arme_in?] and not arme?)[
+          deplacement-ramassage
         ]
         [
-          deplacement-aleatoire
+          ifelse (porte_barricade = nobody and (any? ((patches with [barricade_in?]) in-radius dist_max_deplacement)))
+          [
+            deplacement-ramassage-barricade
+          ]
+          [
+            deplacement-aleatoire
+          ]
         ]
       ]
     ]
