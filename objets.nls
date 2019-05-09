@@ -1,4 +1,5 @@
 breed[armes arme]
+breed[barricades barricade]
 
 to init-objet
    create-armes nb_armes[
@@ -9,4 +10,14 @@ to init-objet
       set arme_in? true
     ]
   ]
+  create-barricades nb_barricades[
+    set shape "barricade"
+    set size 1
+    set color brown
+    move-to one-of patches with [accessible?]
+    ask patches in-radius 0[
+      set barricade_in? true
+    ]   
+  ]
+  
 end

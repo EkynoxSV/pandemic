@@ -3,6 +3,7 @@ breed[humains humain]
 humains-own
 [
   arme?
+  porte_barricade
 ]
 
 to devient-infecte
@@ -127,6 +128,7 @@ to init-humains
     move-to one-of patches with [accessible?]
     set color green
     set arme? false
+    set porte_barricade "non"
   ]
 end
 
@@ -139,16 +141,27 @@ to deplacement-fuite
 end
 
 to deplacement-humains
-  ifelse (any? ((zombies) in-radius dist_perception)) [	   
-    deplacement-fuite
+  ifelse(porte_barricade != nobody)[
+     ask porte_barricade [ move-to myself ]
   ]
   [
-    ifelse(any? (patches in-radius dist_max_deplacement) with [arme_in?] and not arme?)[
-    deplacement-ramassage
+    ifelse (any? ((zombies) in-radius dist_perception)) [	   
+      deplacement-fuite
     ]
-  [
-    deplacement-aleatoire
-  ]
+    [
+      ifelse(any? (patches in-radius dist_max_deplacement) with [arme_in?] and not arme?)[
+        deplacement-ramassage
+      ]
+      [
+        ifelse (porte_barricade != nobody)
+        [
+          
+        ]
+        [
+          deplacement-aleatoire
+        ]
+      ]
+    ]
   ]
 end
 
@@ -170,4 +183,11 @@ to deplacement-ramassage
       set arme_in? false
     ]
   ]
+end
+
+to deplacement-ramassage-barricade
+end
+
+to deplacement-fortification
+  
 end
