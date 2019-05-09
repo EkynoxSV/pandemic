@@ -19,6 +19,7 @@ to init-patches
   import-pcolors "carte.png"
   ask patches [
     set arme_in? false
+    set barricade_in? false
     ifelse (pcolor = black) [
       set accessible? true
     ]
@@ -75,10 +76,22 @@ end
 
 
 to pas-simulation
-    if count humains = 0
-    [ stop ]
+  let barricades_en_place count (barricades-on (patches with [pcolor = blue]))
+  if barricades_en_place = nb_barricades
+  [
+    show "la zone est fortifiée"
+    stop
+  ]
+  if count humains = 0
+  [
+    show "il n'y a plus d'humain"
+    stop
+  ]
   if count zombies = 0
-    [ stop ]
+    [
+    show "il n'y a plus de zombies"
+      stop
+  ]
   deplacements-individus
   tick
 end
@@ -363,7 +376,7 @@ chance_standard
 chance_standard
 0
 1
-0.3
+0.0
 0.1
 1
 NIL
@@ -378,7 +391,7 @@ chance_mastodonte
 chance_mastodonte
 0
 1
-0.1
+0.0
 0.1
 1
 NIL
@@ -393,7 +406,7 @@ chance_virulent
 chance_virulent
 0
 1
-0.1
+0.0
 0.1
 1
 NIL
@@ -408,7 +421,7 @@ chance_rampant
 chance_rampant
 0
 1
-0.2
+0.0
 0.1
 1
 NIL
@@ -423,7 +436,7 @@ chance_sprinteur
 chance_sprinteur
 0
 1
-0.3
+1.0
 0.1
 1
 NIL
@@ -438,7 +451,7 @@ nb_barricades
 nb_barricades
 0
 20
-10.0
+17.0
 1
 1
 NIL
@@ -760,6 +773,27 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+porteur
+false
+0
+Circle -7500403 true true 110 5 80
+Polygon -5825686 true false 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
+Rectangle -7500403 true true 127 79 172 94
+Polygon -7500403 true true 195 90 225 135 210 180 165 105
+Polygon -7500403 true true 105 90 75 120 75 165 135 105
+Polygon -16777216 true false 135 30 120 45 127 50 140 57 146 36
+Polygon -16777216 true false 165 30 180 45 170 51 157 58 151 37
+Rectangle -6459832 true false 75 120 225 180
+Line -16777216 false 105 120 105 180
+Line -16777216 false 120 120 120 180
+Line -16777216 false 135 120 135 180
+Line -16777216 false 150 120 150 180
+Line -16777216 false 165 120 165 180
+Line -16777216 false 180 120 180 180
+Line -16777216 false 195 120 195 180
+Line -16777216 false 210 120 210 180
+Line -16777216 false 90 120 90 180
 
 rampant
 false

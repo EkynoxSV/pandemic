@@ -7,22 +7,13 @@ humains-own
 ]
 
 to devient-infecte
-   ;on lache l'arme si on en a une
-  if(arme?)[
-    ask patches in-radius 0[
-      sprout-armes 1[
-        set size 1
-        set shape "lance"
-      ]
-    ]
-  ]
   
   let rande random-float 1
   let permaxchance (chance_standard + chance_mastodonte + chance_virulent + chance_rampant + chance_sprinteur)
   
   let intervalInf 0
   let intervalSup (chance_standard / permaxchance)
-
+  
   
   ; standard zm
   if rande  < intervalSup[
@@ -36,7 +27,7 @@ to devient-infecte
         set multi_weakness 1
         set nb_target 1
         set slaughterer? false
-      
+        
       ]
     ]
   ]
@@ -54,7 +45,7 @@ to devient-infecte
         set multi_weakness 1
         set nb_target 10
         set slaughterer? false
-      
+        
       ]
     ]
   ]
@@ -63,17 +54,18 @@ to devient-infecte
   set intervalSup (intervalSup + (chance_mastodonte / permaxchance))
   
   ; masto zm
-   if(rande >= intervalInf and rande < intervalSup )[
+  if(rande >= intervalInf and rande < intervalSup )[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
         set shape "mastodonte"
         set zombie_type "mastodonte"
+        set portee_attaque dist_infection
         set multi_speed 1
         set multi_weakness (1 / multi_resistance_mastodonte)
         set nb_target 1
         set slaughterer? true
-      
+        
       ]
     ]
   ]
@@ -83,17 +75,18 @@ to devient-infecte
   set intervalSup (intervalSup + (chance_sprinteur / permaxchance))
   
   ; sprinteur zm
-   if(rande >= intervalInf and rande < intervalSup )[
+  if(rande >= intervalInf and rande < intervalSup )[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
         set shape "sprinteur"
         set zombie_type "sprinteur"
+        set portee_attaque dist_infection
         set multi_speed multi_vitesse_sprinter
         set multi_weakness 1
         set nb_target 2
         set slaughterer? false
-      
+        
       ]
     ]
   ]
@@ -110,11 +103,12 @@ to devient-infecte
         set color grey
         set shape "rampant"
         set zombie_type "rampant"
+        set portee_attaque dist_infection
         set multi_speed 0.5
         set multi_weakness 1.5
         set nb_target 1
         set slaughterer? false
-      
+        
       ]
     ]
   ]
@@ -128,7 +122,7 @@ to init-humains
     move-to one-of patches with [accessible?]
     set color green
     set arme? false
-    set porte_barricade "non"
+    set porte_barricade nobody
   ]
 end
 
@@ -141,8 +135,8 @@ to deplacement-fuite
 end
 
 to deplacement-humains
-  ifelse(porte_barricade != nobody)[
-     ask porte_barricade [ move-to myself ]
+  ifelse(porte_barricade != nobody and (any? ((patches with [pcolor = blue]) in-radius dist_perception)) )[
+    deplacement-fortification
   ]
   [
     ifelse (any? ((zombies) in-radius dist_perception)) [	   
@@ -153,15 +147,19 @@ to deplacement-humains
         deplacement-ramassage
       ]
       [
-        ifelse (porte_barricade != nobody)
+        ifelse (porte_barricade = nobody and (any? ((patches with [barricade_in?]) in-radius dist_max_deplacement)))
         [
-          
+          deplacement-ramassage-barricade
         ]
         [
           deplacement-aleatoire
         ]
       ]
     ]
+  ] 
+  if(porte_barricade != nobody)
+  [
+    ask porte_barricade [ move-to myself ]
   ]
 end
 
@@ -186,8 +184,72 @@ to deplacement-ramassage
 end
 
 to deplacement-ramassage-barricade
+  let patches_avec_barricade (patches in-radius dist_max_deplacement) with [barricade_in?]
+  move-to one-of patches_avec_barricade
+  set porte_barricade one-of barricades-here with [not hidden?]
+  ask porte_barricade
+    [ hide-turtle ]  ; rend la barricade invisible pour les autre humains
+  set shape "porteur"     ; change l'aspect de l'humain
+                          ;on regarde si il n'y a plus de barricade au sol pour en informer le patch
+  let nombre_barricades_sol count barricades with [not hidden?]  in-radius 0
+  ; si il ny a plus d'arme on préviens le patch
+  if (nombre_barricades_sol = 0)[
+    ask patches in-radius 0[
+      set barricade_in? false
+    ]
+  ]
 end
 
 to deplacement-fortification
+  ; on regarde ou est l'objectif le plus proche
+  let objectif_plus_proche min-one-of (patches with [pcolor = blue]) [distance myself]
+  ;on regarde si on peut atteindre un de ces patches
+  let patches_possibles (patches in-radius dist_max_deplacement) with [pcolor = blue]
+  ; si on à un patch à porté on va dessus et on lache la caisse
+  ifelse (any? patches_possibles) [
+    ;on se déplace avec la barricade sur l'objectif
+    move-to min-one-of patches_possibles [distance objectif_plus_proche]
+    ask porte_barricade [ move-to myself ]
+    ;on lache la barricade
+    ask porte_barricade
+    [ show-turtle ]       ; on fait apparaitre la barricade
+                          ;on reprend son ancien aspect
+    ifelse(arme?)[
+      set shape "resistant"
+    ]
+    [
+      set shape "person"
+    ]
+    set porte_barricade nobody
+  ]
+  ; sinon on s'en approche
+  [  
+    move-to objectif_plus_proche
+  ]
+  
+end
+
+
+to lache-equipement
+  
+  ;on lache l'arme si on en a une
+  if(arme?)[
+    ask patches in-radius 0[
+      sprout-armes 1[
+        set size 1
+        set shape "lance"
+      ]
+      set arme_in? true
+    ]      
+  ]
+  
+  ;on lache la barricade si on en a une
+  if (porte_barricade != nobody)[
+    ask porte_barricade
+    [ show-turtle ]       ; on fait apparaitre la barricade
+    ask patches in-radius 0[
+      set barricade_in? true
+    ]
+  ]
   
 end
