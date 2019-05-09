@@ -39,9 +39,12 @@ to infections-individus
     
       ask n-of nb_cibles humains in-radius dist_infection
       [
+      if (myself = nobody) [stop]
       set color red
-      ifelse(arme?)[
+      ifelse(arme? and porte_barricade = nobody)[
           if random-float 1 <= proba_touche / 2 [
+          ;l'humain lache ce qu'il tient
+          lache-equipement
             ;lors d'une attaque réussi, le zombie va soit infecter soit tuer sa victime
           ifelse( [slaughterer?] of myself)[
                die
@@ -62,6 +65,8 @@ to infections-individus
       
       [
         if random-float 1 <= proba_touche [
+          ;l'humain lache ce qu'il tient
+          lache-equipement
           ifelse(  [slaughterer?] of myself )[
                die
             ]

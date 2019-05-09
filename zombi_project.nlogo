@@ -10,6 +10,7 @@ directed-link-breed [contaminations contamination]
 patches-own[
   accessible?
   arme_in?
+  barricade_in?
 ]
 
 
@@ -18,10 +19,17 @@ to init-patches
   import-pcolors "carte.png"
   ask patches [
     set arme_in? false
+    set barricade_in? false
     ifelse (pcolor = black) [
       set accessible? true
     ]
     [set accessible? false]
+  ]
+  ask one-of patches with [accessible?] [
+    set pcolor blue
+    ask patches in-radius 1 with [accessible?][
+      set pcolor blue
+    ]
   ]
 end
 
@@ -68,10 +76,22 @@ end
 
 
 to pas-simulation
-    if count humains = 0
-    [ stop ]
+  let barricades_en_place count (barricades-on (patches with [pcolor = blue]))
+  if barricades_en_place = nb_barricades
+  [
+    show "la zone est fortifiée"
+    stop
+  ]
+  if count humains = 0
+  [
+    show "il n'y a plus d'humain"
+    stop
+  ]
   if count zombies = 0
-    [ stop ]
+    [
+    show "il n'y a plus de zombies"
+      stop
+  ]
   deplacements-individus
   tick
 end
@@ -296,7 +316,7 @@ proba_infection
 proba_infection
 0
 1
-0.35
+0.75
 0.05
 1
 NIL
@@ -350,13 +370,13 @@ HORIZONTAL
 SLIDER
 388
 477
-425
+421
 627
 chance_standard
 chance_standard
 0
 1
-0.3
+0.0
 0.1
 1
 NIL
@@ -365,13 +385,13 @@ VERTICAL
 SLIDER
 468
 477
-505
+501
 627
 chance_mastodonte
 chance_mastodonte
 0
 1
-0.1
+0.0
 0.1
 1
 NIL
@@ -380,13 +400,13 @@ VERTICAL
 SLIDER
 549
 477
-586
+582
 627
 chance_virulent
 chance_virulent
 0
 1
-0.1
+0.0
 0.1
 1
 NIL
@@ -395,13 +415,13 @@ VERTICAL
 SLIDER
 509
 477
-546
+542
 627
 chance_rampant
 chance_rampant
 0
 1
-0.2
+0.0
 0.1
 1
 NIL
@@ -410,17 +430,32 @@ VERTICAL
 SLIDER
 428
 477
-465
+461
 627
 chance_sprinteur
 chance_sprinteur
 0
 1
-0.3
+1.0
 0.1
 1
 NIL
 VERTICAL
+
+SLIDER
+21
+307
+193
+340
+nb_barricades
+nb_barricades
+0
+20
+17.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -474,6 +509,38 @@ true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
 
+barricade
+false
+0
+Rectangle -7500403 false true 0 75 300 225
+Rectangle -7500403 true true 0 75 300 225
+Line -16777216 false 0 210 300 210
+Line -16777216 false 0 90 300 90
+Line -16777216 false 150 90 150 210
+Line -16777216 false 120 90 120 210
+Line -16777216 false 90 90 90 210
+Line -16777216 false 240 90 240 210
+Line -16777216 false 270 90 270 210
+Line -16777216 false 30 90 30 210
+Line -16777216 false 60 90 60 210
+Line -16777216 false 210 90 210 210
+Line -16777216 false 180 90 180 210
+Polygon -7500403 true true 1 77 8 64 12 76 22 63 26 75 40 63 44 75 61 63 67 75 70 63 78 74 80 63 92 73 97 65 99 76 109 70 111 75
+Polygon -7500403 true true 121 77 132 66 137 77 141 68 136 61 132 60 135 55 140 55 141 60 147 63 147 69 159 53 156 64 154 71 159 76 164 65 168 75 168 63 181 78 184 66 191 76 193 67 199 74 203 68 191 60 210 60 211 77 225 64 224 75 236 76 231 69 239 64 243 77 250 63 251 75 258 63 262 78 268 62 276 74 277 64 291 70 293 76 124 77 130 72
+Polygon -2674135 true false 139 63 133 59 132 60 133 55 137 55 140 55 141 55 140 59 140 62
+Polygon -2674135 true false 194 59 205 60 200 65 192 59 196 59
+Polygon -2674135 true false 240 63 233 68 236 71 240 69 239 63
+Polygon -2674135 true false 63 72 55 70 58 66
+Polygon -2674135 true false 79 62 79 70 83 72 87 70 84 66 80 63
+Polygon -2674135 true false 268 63 264 71 267 71 270 72 273 69 271 66 268 64
+Polygon -2674135 true false 158 54 151 62 154 67 156 67 159 53
+Polygon -2674135 true false 55 106 52 113 56 120 55 124 57 128 59 135 62 129 58 124 58 116 55 106
+Polygon -16777216 true false 181 128 172 137 172 151 167 159 165 174 159 187 157 194 162 201 167 195 164 191 169 181 170 169 175 167 182 166 179 153 174 154 180 128
+Polygon -2674135 true false 163 199 160 204 157 208 160 203 158 201 163 199 165 201
+Polygon -2674135 true false 161 204 161 214 165 217 166 210 164 199 162 202
+Polygon -2674135 true false 183 165 182 169 186 173
+Polygon -2674135 true false 176 167 173 172 177 181 182 178 176 169
+
 box
 false
 0
@@ -525,6 +592,23 @@ false
 0
 Circle -7500403 true true 0 0 300
 Circle -16777216 true false 30 30 240
+
+container
+false
+0
+Rectangle -7500403 false false 0 75 300 225
+Rectangle -7500403 true true 0 75 300 225
+Line -16777216 false 0 210 300 210
+Line -16777216 false 0 90 300 90
+Line -16777216 false 150 90 150 210
+Line -16777216 false 120 90 120 210
+Line -16777216 false 90 90 90 210
+Line -16777216 false 240 90 240 210
+Line -16777216 false 270 90 270 210
+Line -16777216 false 30 90 30 210
+Line -16777216 false 60 90 60 210
+Line -16777216 false 210 90 210 210
+Line -16777216 false 180 90 180 210
 
 cow
 false
@@ -689,6 +773,27 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+porteur
+false
+0
+Circle -7500403 true true 110 5 80
+Polygon -5825686 true false 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
+Rectangle -7500403 true true 127 79 172 94
+Polygon -7500403 true true 195 90 225 135 210 180 165 105
+Polygon -7500403 true true 105 90 75 120 75 165 135 105
+Polygon -16777216 true false 135 30 120 45 127 50 140 57 146 36
+Polygon -16777216 true false 165 30 180 45 170 51 157 58 151 37
+Rectangle -6459832 true false 75 120 225 180
+Line -16777216 false 105 120 105 180
+Line -16777216 false 120 120 120 180
+Line -16777216 false 135 120 135 180
+Line -16777216 false 150 120 150 180
+Line -16777216 false 165 120 165 180
+Line -16777216 false 180 120 180 180
+Line -16777216 false 195 120 195 180
+Line -16777216 false 210 120 210 180
+Line -16777216 false 90 120 90 180
 
 rampant
 false
