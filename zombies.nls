@@ -31,13 +31,19 @@ end
 
 to infections-individus
   if (any? humains in-radius portee_attaque)[
-      ask n-of nb_target humains in-radius dist_infection
+    let nb_cibles nb_target 
+    if(nb_cibles > count(humains in-radius dist_infection))[
+      set nb_cibles count(humains in-radius dist_infection)
+  ]
+    
+    
+      ask n-of nb_cibles humains in-radius dist_infection
       [
       set color red
       ifelse(arme?)[
           if random-float 1 <= proba_touche / 2 [
             ;lors d'une attaque réussi, le zombie va soit infecter soit tuer sa victime
-            ifelse(slaughterer?)[
+          ifelse( [slaughterer?] of myself)[
                die
             ]
             [
@@ -56,7 +62,7 @@ to infections-individus
       
       [
         if random-float 1 <= proba_touche [
-            ifelse(slaughterer?)[
+          ifelse(  [slaughterer?] of myself )[
                die
             ]
             [
@@ -75,7 +81,7 @@ to infections-individus
       set color green
       ;si l'humain tient une arme le zombie à une chance de mourir
       if(arme?)[
-        if random-float 1 <= puissance_arme * multi_weakness[
+        if random-float 1 <= puissance_arme * [multi_weakness] of myself [
           ask myself [die]
         ]
       ]

@@ -17,8 +17,14 @@ to devient-infecte
   ]
   
   let rande random-float 1
+  let permaxchance (chance_standard + chance_mastodonte + chance_virulent + chance_rampant + chance_sprinteur)
+  
+  let intervalInf 0
+  let intervalSup (chance_standard / permaxchance)
+
+  
   ; standard zm
-  if rande  < 0.2[
+  if rande  < intervalSup[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
@@ -33,8 +39,10 @@ to devient-infecte
       ]
     ]
   ]
+  set intervalInf intervalSup
+  set intervalSup (intervalSup + (chance_virulent / permaxchance))
   ; virulent zm
-  if(rande >= 0.2 and rande < 0.4 )[
+  if(rande >= intervalInf and rande < intervalSup )[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
@@ -50,9 +58,11 @@ to devient-infecte
     ]
   ]
   
+  set intervalInf intervalSup
+  set intervalSup (intervalSup + (chance_mastodonte / permaxchance))
   
   ; masto zm
-  if(rande >= 0.4 and rande < 0.6)[
+   if(rande >= intervalInf and rande < intervalSup )[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
@@ -68,9 +78,11 @@ to devient-infecte
   ]
   
   
+  set intervalInf intervalSup
+  set intervalSup (intervalSup + (chance_sprinteur / permaxchance))
   
   ; sprinteur zm
-  if(rande >= 0.6 and rande < 0.8)[
+   if(rande >= intervalInf and rande < intervalSup )[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
@@ -87,14 +99,17 @@ to devient-infecte
   
   
   
+  set intervalInf intervalSup
+  set intervalSup (intervalSup + (chance_rampant / permaxchance))
+  
   ; ranpant zm
-  if(rande >= 0.8 )[
+  if(rande >= intervalInf )[
     ask patches in-radius 0[
       sprout-zombies 1[
         set color grey
         set shape "rampant"
         set zombie_type "rampant"
-        set multi_speed 1
+        set multi_speed 0.5
         set multi_weakness 1.5
         set nb_target 1
         set slaughterer? false
